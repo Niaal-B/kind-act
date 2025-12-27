@@ -2,11 +2,17 @@
   display: flex;
   flex: 1;
   overflow: hidden;
+  flex-direction: row;
 }
 
 .map-section {
   flex: 1;
   position: relative;
+  min-width: 0;
+}
+
+.sidebar {
+  flex-shrink: 0;
 }
 
 .loading-container {
