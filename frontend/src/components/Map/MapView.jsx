@@ -44,51 +44,70 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
 
   // Update heatmap when acts data changes
   useEffect(() => {
-    if (!mapInstanceRef.current || !window.L || !window.L.heatLayer) {
+    if (!mapInstanceRef.current || !window.L) {
       return;
     }
 
-    // Remove existing heat layer
-    if (heatLayerRef.current) {
-      mapInstanceRef.current.removeLayer(heatLayerRef.current);
+    // Wait for heatLayer plugin to be available
+    const checkHeatLayer = setInterval(() => {
+      if (window.L.heatLayer) {
+        clearInterval(checkHeatLayer);
+        updateHeatLayer();
+      }
+    }, 100);
+
+    const updateHeatLayer = () => {
+      // Remove existing heat layer
+      if (heatLayerRef.current) {
+        mapInstanceRef.current.removeLayer(heatLayerRef.current);
+      }
+
+      if (acts && acts.length > 0 && window.L.heatLayer) {
+        // Transform acts data for heatmap [lat, lng, intensity]
+        const heatData = acts.map(act => [
+          parseFloat(act.latitude),
+          parseFloat(act.longitude),
+          0.8
+        ]);
+
+        // Create heat layer
+        heatLayerRef.current = window.L.heatLayer(heatData, {
+          radius: 50,
+          blur: 30,
+          maxZoom: 18,
+          max: 1.0,
+          minOpacity: 0.4,
+          gradient: {
+            0.0: '#0000FF',
+            0.1: '#0066FF',
+            0.2: '#00CCFF',
+            0.3: '#33FFCC',
+            0.4: '#66FF99',
+            0.5: '#99FF66',
+            0.6: '#CCFF33',
+            0.65: '#FFCC00',
+            0.7: '#FF9900',
+            0.75: '#FF6600',
+            0.8: '#FF3300',
+            0.85: '#FF0000',
+            0.9: '#CC0000',
+            0.95: '#990000',
+            1.0: '#660000'
+          }
+        });
+
+        heatLayerRef.current.addTo(mapInstanceRef.current);
+      }
+    };
+
+    // Initial check
+    if (window.L.heatLayer) {
+      updateHeatLayer();
     }
 
-    if (acts && acts.length > 0) {
-      // Transform acts data for heatmap [lat, lng, intensity]
-      const heatData = acts.map(act => [
-        parseFloat(act.latitude),
-        parseFloat(act.longitude),
-        0.8
-      ]);
-
-      // Create heat layer
-      heatLayerRef.current = window.L.heatLayer(heatData, {
-        radius: 50,
-        blur: 30,
-        maxZoom: 18,
-        max: 1.0,
-        minOpacity: 0.4,
-        gradient: {
-          0.0: '#0000FF',
-          0.1: '#0066FF',
-          0.2: '#00CCFF',
-          0.3: '#33FFCC',
-          0.4: '#66FF99',
-          0.5: '#99FF66',
-          0.6: '#CCFF33',
-          0.65: '#FFCC00',
-          0.7: '#FF9900',
-          0.75: '#FF6600',
-          0.8: '#FF3300',
-          0.85: '#FF0000',
-          0.9: '#CC0000',
-          0.95: '#990000',
-          1.0: '#660000'
-        }
-      });
-
-      heatLayerRef.current.addTo(mapInstanceRef.current);
-    }
+    return () => {
+      clearInterval(checkHeatLayer);
+    };
   }, [acts]);
 
   return (
@@ -116,13 +135,6 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
     </div>
   );
 };
-
-// Load Leaflet heat plugin
-if (typeof window !== 'undefined' && window.L && !window.L.heatLayer) {
-  const script = document.createElement('script');
-  script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
-  document.head.appendChild(script);
-}
 
 export default MapView;
 
