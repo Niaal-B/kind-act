@@ -52,15 +52,41 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
       // Remove existing heat layer
       if (heatLayerRef.current) {
         mapInstanceRef.current.removeLayer(heatLayerRef.current);
+        heatLayerRef.current = null;
       }
 
-      if (acts && acts.length > 0 && window.L.heatLayer) {
+      if (!acts || !Array.isArray(acts) || acts.length === 0) {
+        console.log('No acts data or empty array');
+        return;
+      }
+
+      if (!window.L.heatLayer) {
+        console.error('Leaflet.heat plugin not loaded');
+        return;
+      }
+
+      try {
         // Transform acts data for heatmap [lat, lng, intensity]
-        const heatData = acts.map(act => [
-          parseFloat(act.latitude),
-          parseFloat(act.longitude),
-          0.8
-        ]);
+        const heatData = acts
+          .filter(act => act.latitude && act.longitude) // Filter out invalid coordinates
+          .map(act => {
+            const lat = parseFloat(act.latitude);
+            const lng = parseFloat(act.longitude);
+            // Validate coordinates
+            if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+              console.warn('Invalid coordinates:', act);
+              return null;
+            }
+            return [lat, lng, 0.8];
+          })
+          .filter(point => point !== null); // Remove null entries
+
+        if (heatData.length === 0) {
+          console.log('No valid heatmap data points');
+          return;
+        }
+
+        console.log(`Creating heatmap with ${heatData.length} points`);
 
         // Create heat layer
         heatLayerRef.current = window.L.heatLayer(heatData, {
@@ -89,6 +115,9 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
         });
 
         heatLayerRef.current.addTo(mapInstanceRef.current);
+        console.log('Heatmap layer added successfully');
+      } catch (error) {
+        console.error('Error creating heatmap:', error);
       }
     };
 
@@ -96,12 +125,22 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
     if (window.L.heatLayer) {
       updateHeatLayer();
     } else {
+      console.log('Waiting for Leaflet.heat plugin to load...');
       const checkHeatLayer = setInterval(() => {
         if (window.L.heatLayer) {
+          console.log('Leaflet.heat plugin loaded');
           clearInterval(checkHeatLayer);
           updateHeatLayer();
         }
       }, 100);
+
+      // Timeout after 5 seconds
+      setTimeout(() => {
+        clearInterval(checkHeatLayer);
+        if (!window.L.heatLayer) {
+          console.error('Leaflet.heat plugin failed to load after 5 seconds');
+        }
+      }, 5000);
 
       return () => clearInterval(checkHeatLayer);
     }

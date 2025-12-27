@@ -25,11 +25,24 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Santa's Community Impact Map</title>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <!-- Leaflet Heat Plugin - Load after Leaflet -->
+    <script>
+      // Load Leaflet.heat after the page loads and Leaflet is available
+      window.addEventListener('load', function() {
+        if (window.L && !window.L.heatLayer) {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
+          script.onerror = function() {
+            console.error('Failed to load Leaflet.heat plugin');
+          };
+          document.body.appendChild(script);
+        }
+      });
+    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
