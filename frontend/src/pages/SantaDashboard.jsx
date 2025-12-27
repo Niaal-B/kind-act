@@ -37,6 +37,17 @@ const SantaDashboard = () => {
       filtered = filtered.filter(act => act.category === activeCategory);
     }
     
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(act => {
+        const cityMatch = act.city && act.city.toLowerCase().includes(searchLower);
+        const countryMatch = act.country && act.country.toLowerCase().includes(searchLower);
+        const descMatch = act.description && act.description.toLowerCase().includes(searchLower);
+        return cityMatch || countryMatch || descMatch;
+      });
+    }
+    
     // Apply time filter
     if (activeTimeFilter !== TIME_FILTERS.ALL) {
       const now = new Date();
@@ -62,7 +73,14 @@ const SantaDashboard = () => {
     }
     
     setFilteredActs(filtered);
-  }, [acts, activeCategory, activeTimeFilter]);
+    
+    // If search term and results exist, center map on first result
+    if (searchTerm && filtered.length > 0) {
+      const firstResult = filtered[0];
+      setMapCenter([parseFloat(firstResult.latitude), parseFloat(firstResult.longitude)]);
+      setMapZoom(8);
+    }
+  }, [acts, activeCategory, activeTimeFilter, searchTerm]);
 
   // Check if already authenticated (simple session check)
   useEffect(() => {
@@ -151,6 +169,18 @@ const SantaDashboard = () => {
     setRegionData(null);
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setRegionData(null);
+  };
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+    setMapCenter([20, 0]);
+    setMapZoom(2);
+    setRegionData(null);
+  };
+
   const handleSubmitAct = async (formData) => {
     try {
       await actsAPI.create(formData);
@@ -210,6 +240,8 @@ const SantaDashboard = () => {
             <MapView
               acts={filteredActs}
               onMapClick={handleMapClick}
+              center={mapCenter}
+              zoom={mapZoom}
             />
           </div>
           <Sidebar
@@ -222,6 +254,8 @@ const SantaDashboard = () => {
             stats={stats}
             acts={acts}
             showAnalytics={true}
+            onSearch={handleSearch}
+            onSearchClear={handleSearchClear}
           />
         </div>
       </div>

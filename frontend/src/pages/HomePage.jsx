@@ -23,7 +23,7 @@ const HomePage = () => {
     fetchStats();
   }, []);
 
-  // Filter acts when category or time filter changes
+  // Filter acts when category, time filter, or search term changes
   useEffect(() => {
     if (!Array.isArray(acts)) {
       setFilteredActs([]);
@@ -31,6 +31,17 @@ const HomePage = () => {
     }
     
     let filtered = [...acts];
+    
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(act => {
+        const cityMatch = act.city && act.city.toLowerCase().includes(searchLower);
+        const countryMatch = act.country && act.country.toLowerCase().includes(searchLower);
+        const descMatch = act.description && act.description.toLowerCase().includes(searchLower);
+        return cityMatch || countryMatch || descMatch;
+      });
+    }
     
     // Apply category filter
     if (activeCategory !== CATEGORIES.ALL) {
@@ -62,7 +73,14 @@ const HomePage = () => {
     }
     
     setFilteredActs(filtered);
-  }, [acts, activeCategory, activeTimeFilter]);
+    
+    // If search term and results exist, center map on first result
+    if (searchTerm && filtered.length > 0) {
+      const firstResult = filtered[0];
+      setMapCenter([parseFloat(firstResult.latitude), parseFloat(firstResult.longitude)]);
+      setMapZoom(8);
+    }
+  }, [acts, activeCategory, activeTimeFilter, searchTerm]);
 
   const fetchActs = async () => {
     try {
@@ -116,6 +134,18 @@ const HomePage = () => {
     setRegionData(null); // Clear region data when filter changes
   };
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setRegionData(null);
+  };
+
+  const handleSearchClear = () => {
+    setSearchTerm('');
+    setMapCenter([20, 0]);
+    setMapZoom(2);
+    setRegionData(null);
+  };
+
   const handleSubmitAct = async (formData) => {
     try {
       await actsAPI.create(formData);
@@ -147,6 +177,8 @@ const HomePage = () => {
           <MapView
             acts={filteredActs}
             onMapClick={handleMapClick}
+            center={mapCenter}
+            zoom={mapZoom}
           />
         </div>
         <Sidebar
@@ -156,6 +188,8 @@ const HomePage = () => {
           onTimeFilterChange={handleTimeFilterChange}
           regionData={regionData}
           onSubmitAct={handleSubmitAct}
+          onSearch={handleSearch}
+          onSearchClear={handleSearchClear}
         />
       </div>
       {error && (
