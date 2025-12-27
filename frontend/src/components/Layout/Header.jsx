@@ -1,7 +1,11 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
 const Header = ({ stats }) => {
+  const location = useLocation();
+  const isDashboard = location.pathname === '/santa-dashboard';
+
   return (
     <header className="app-header">
       <div className="header-content">
@@ -9,6 +13,11 @@ const Header = ({ stats }) => {
           <h1>🎅 Santa's Community Impact Map</h1>
           <p>Visualizing acts of kindness and community impact across the globe</p>
         </div>
+        {!isDashboard && (
+          <Link to="/santa-dashboard" className="dashboard-link">
+            🎅 Santa Dashboard
+          </Link>
+        )}
         
         {stats && (
           <div className="stats-bar">
