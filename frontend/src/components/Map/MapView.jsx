@@ -48,14 +48,6 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
       return;
     }
 
-    // Wait for heatLayer plugin to be available
-    const checkHeatLayer = setInterval(() => {
-      if (window.L.heatLayer) {
-        clearInterval(checkHeatLayer);
-        updateHeatLayer();
-      }
-    }, 100);
-
     const updateHeatLayer = () => {
       // Remove existing heat layer
       if (heatLayerRef.current) {
@@ -100,14 +92,19 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
       }
     };
 
-    // Initial check
+    // Check if heatLayer plugin is loaded, if not wait for it
     if (window.L.heatLayer) {
       updateHeatLayer();
-    }
+    } else {
+      const checkHeatLayer = setInterval(() => {
+        if (window.L.heatLayer) {
+          clearInterval(checkHeatLayer);
+          updateHeatLayer();
+        }
+      }, 100);
 
-    return () => {
-      clearInterval(checkHeatLayer);
-    };
+      return () => clearInterval(checkHeatLayer);
+    }
   }, [acts]);
 
   return (
@@ -137,4 +134,3 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
 };
 
 export default MapView;
-
