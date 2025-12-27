@@ -22,6 +22,9 @@ const SantaDashboard = () => {
   const [regionData, setRegionData] = useState(null);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES.ALL);
   const [activeTimeFilter, setActiveTimeFilter] = useState(TIME_FILTERS.ALL);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [mapCenter, setMapCenter] = useState([20, 0]);
+  const [mapZoom, setMapZoom] = useState(2);
 
   // Filter acts when category or time filter changes
   useEffect(() => {
