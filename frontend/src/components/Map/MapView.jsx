@@ -18,10 +18,6 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
         zoomControl: true,
         attributionControl: true,
       }).setView(center, zoom);
-    } else {
-      // Update map view if center/zoom changes
-      mapInstanceRef.current.setView(center, zoom);
-    }
 
       // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -47,6 +43,13 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
         mapInstanceRef.current = null;
       }
     };
+  }, []);
+
+  // Update map view when center/zoom changes
+  useEffect(() => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView(center, zoom);
+    }
   }, [center, zoom]);
 
   // Update heatmap when acts data changes
