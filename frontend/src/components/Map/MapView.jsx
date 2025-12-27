@@ -3,6 +3,9 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapView.css';
 
+// Import leaflet.heat - it modifies L.heatLayer globally
+import 'leaflet.heat';
+
 const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
@@ -60,7 +63,7 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
         return;
       }
 
-      if (!window.L.heatLayer) {
+      if (!L.heatLayer) {
         console.error('Leaflet.heat plugin not loaded');
         return;
       }
@@ -86,10 +89,10 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
           return;
         }
 
-        console.log(`Creating heatmap with ${heatData.length} points`);
+        console.log(`Creating heatmap with ${heatData.length} points:`, heatData);
 
-        // Create heat layer
-        heatLayerRef.current = window.L.heatLayer(heatData, {
+        // Create heat layer using L.heatLayer (from leaflet.heat package)
+        heatLayerRef.current = L.heatLayer(heatData, {
           radius: 50,
           blur: 30,
           maxZoom: 18,
@@ -121,29 +124,8 @@ const MapView = ({ acts, onMapClick, center = [20, 0], zoom = 2 }) => {
       }
     };
 
-    // Check if heatLayer plugin is loaded, if not wait for it
-    if (window.L.heatLayer) {
-      updateHeatLayer();
-    } else {
-      console.log('Waiting for Leaflet.heat plugin to load...');
-      const checkHeatLayer = setInterval(() => {
-        if (window.L.heatLayer) {
-          console.log('Leaflet.heat plugin loaded');
-          clearInterval(checkHeatLayer);
-          updateHeatLayer();
-        }
-      }, 100);
-
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        clearInterval(checkHeatLayer);
-        if (!window.L.heatLayer) {
-          console.error('Leaflet.heat plugin failed to load after 5 seconds');
-        }
-      }, 5000);
-
-      return () => clearInterval(checkHeatLayer);
-    }
+    // Update heatmap - L.heatLayer should be available from import
+    updateHeatLayer();
   }, [acts]);
 
   return (
