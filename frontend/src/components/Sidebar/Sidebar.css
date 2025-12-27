@@ -1,5 +1,6 @@
 .sidebar {
   width: 380px;
+  min-width: 380px;
   background: white;
   padding: 24px;
   box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
@@ -8,6 +9,7 @@
   flex-direction: column;
   flex-shrink: 0;
   height: 100%;
+  order: 2;
 }
 
 .submit-btn {

@@ -9,10 +9,7 @@
   flex: 1;
   position: relative;
   min-width: 0;
-}
-
-.sidebar {
-  flex-shrink: 0;
+  order: 1;
 }
 
 .loading-container {
