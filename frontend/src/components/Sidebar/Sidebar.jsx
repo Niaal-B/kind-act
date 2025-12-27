@@ -6,7 +6,7 @@ import SubmissionForm from '../Forms/SubmissionForm';
 import { CATEGORIES } from '../../utils/constants';
 import './Sidebar.css';
 
-const Sidebar = ({ activeCategory, onCategoryChange, activeTimeFilter, onTimeFilterChange, regionData, onSubmitAct }) => {
+const Sidebar = ({ activeCategory, onCategoryChange, activeTimeFilter, onTimeFilterChange, regionData, onSubmitAct, stats, acts, showAnalytics = false }) => {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -22,6 +22,10 @@ const Sidebar = ({ activeCategory, onCategoryChange, activeTimeFilter, onTimeFil
             activeCategory={activeCategory}
             onCategoryChange={onCategoryChange}
           />
+
+          {showAnalytics && stats && acts && (
+            <AnalyticsPanel stats={stats} acts={acts} />
+          )}
 
           <RegionInfo regionData={regionData} />
 

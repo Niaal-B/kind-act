@@ -219,6 +219,9 @@ const SantaDashboard = () => {
             onTimeFilterChange={handleTimeFilterChange}
             regionData={regionData}
             onSubmitAct={handleSubmitAct}
+            stats={stats}
+            acts={acts}
+            showAnalytics={true}
           />
         </div>
       </div>
