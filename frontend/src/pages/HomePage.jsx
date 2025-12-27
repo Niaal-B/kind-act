@@ -23,6 +23,11 @@ const HomePage = () => {
 
   // Filter acts when category changes
   useEffect(() => {
+    if (!Array.isArray(acts)) {
+      setFilteredActs([]);
+      return;
+    }
+    
     if (activeCategory === CATEGORIES.ALL) {
       setFilteredActs(acts);
     } else {
@@ -34,12 +39,18 @@ const HomePage = () => {
     try {
       setLoading(true);
       const response = await actsAPI.getAll();
-      setActs(response.data);
-      setFilteredActs(response.data);
+      // Handle paginated response (response.data.results) or direct array (response.data)
+      const actsData = Array.isArray(response.data) 
+        ? response.data 
+        : (response.data.results || []);
+      setActs(actsData);
+      setFilteredActs(actsData);
       setError(null);
     } catch (err) {
       console.error('Error fetching acts:', err);
       setError('Failed to load acts. Please refresh the page.');
+      setActs([]);
+      setFilteredActs([]);
     } finally {
       setLoading(false);
     }
