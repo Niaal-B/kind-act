@@ -24,7 +24,10 @@ const Sidebar = ({ activeCategory, onCategoryChange, activeTimeFilter, onTimeFil
           />
 
           {showAnalytics && stats && acts && (
-            <AnalyticsPanel stats={stats} acts={acts} />
+            <>
+              <AnalyticsPanel stats={stats} acts={acts} />
+              <ExportButton acts={acts} stats={stats} />
+            </>
           )}
 
           <RegionInfo regionData={regionData} />

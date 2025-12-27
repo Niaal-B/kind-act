@@ -1,0 +1,76 @@
+.export-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.export-section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 12px 0;
+}
+
+.export-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.export-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  background: white;
+  color: #4a5568;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.export-btn:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.export-btn.csv {
+  border-color: #48bb78;
+  color: #48bb78;
+}
+
+.export-btn.csv:hover {
+  background: #f0fff4;
+  border-color: #38a169;
+}
+
+.export-btn.json {
+  border-color: #4299e1;
+  color: #4299e1;
+}
+
+.export-btn.json:hover {
+  background: #ebf8ff;
+  border-color: #3182ce;
+}
+
+.export-info {
+  text-align: center;
+  color: #718096;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .export-buttons {
+    flex-direction: column;
+  }
+}
+
