@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
 import CategoryFilter from '../Filters/CategoryFilter';
+import TimeFilter, { TIME_FILTERS } from '../Filters/TimeFilter';
 import RegionInfo from './RegionInfo';
 import SubmissionForm from '../Forms/SubmissionForm';
 import { CATEGORIES } from '../../utils/constants';
 import './Sidebar.css';
 
-const Sidebar = ({ activeCategory, onCategoryChange, regionData, onSubmitAct }) => {
+const Sidebar = ({ activeCategory, onCategoryChange, activeTimeFilter, onTimeFilterChange, regionData, onSubmitAct }) => {
   const [showForm, setShowForm] = useState(false);
 
   return (
     <div className="sidebar">
       {!showForm ? (
         <>
+          <TimeFilter
+            activeFilter={activeTimeFilter}
+            onFilterChange={onTimeFilterChange}
+          />
+          
           <CategoryFilter
             activeCategory={activeCategory}
             onCategoryChange={onCategoryChange}

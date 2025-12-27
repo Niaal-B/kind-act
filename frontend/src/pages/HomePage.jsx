@@ -4,6 +4,7 @@ import MapView from '../components/Map/MapView';
 import Sidebar from '../components/Sidebar/Sidebar';
 import { actsAPI } from '../services/api';
 import { CATEGORIES } from '../utils/constants';
+import { TIME_FILTERS } from '../components/Filters/TimeFilter';
 import './HomePage.css';
 
 const HomePage = () => {
@@ -12,6 +13,7 @@ const HomePage = () => {
   const [stats, setStats] = useState(null);
   const [regionData, setRegionData] = useState(null);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES.ALL);
+  const [activeTimeFilter, setActiveTimeFilter] = useState(TIME_FILTERS.ALL);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -21,19 +23,46 @@ const HomePage = () => {
     fetchStats();
   }, []);
 
-  // Filter acts when category changes
+  // Filter acts when category or time filter changes
   useEffect(() => {
     if (!Array.isArray(acts)) {
       setFilteredActs([]);
       return;
     }
     
-    if (activeCategory === CATEGORIES.ALL) {
-      setFilteredActs(acts);
-    } else {
-      setFilteredActs(acts.filter(act => act.category === activeCategory));
+    let filtered = [...acts];
+    
+    // Apply category filter
+    if (activeCategory !== CATEGORIES.ALL) {
+      filtered = filtered.filter(act => act.category === activeCategory);
     }
-  }, [acts, activeCategory]);
+    
+    // Apply time filter
+    if (activeTimeFilter !== TIME_FILTERS.ALL) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weekAgo = new Date(today);
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const monthAgo = new Date(today);
+      monthAgo.setMonth(monthAgo.getMonth() - 1);
+      
+      filtered = filtered.filter(act => {
+        const actDate = new Date(act.created_at);
+        switch (activeTimeFilter) {
+          case TIME_FILTERS.TODAY:
+            return actDate >= today;
+          case TIME_FILTERS.THIS_WEEK:
+            return actDate >= weekAgo;
+          case TIME_FILTERS.THIS_MONTH:
+            return actDate >= monthAgo;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    setFilteredActs(filtered);
+  }, [acts, activeCategory, activeTimeFilter]);
 
   const fetchActs = async () => {
     try {
@@ -82,6 +111,11 @@ const HomePage = () => {
     setRegionData(null); // Clear region data when filter changes
   };
 
+  const handleTimeFilterChange = (timeFilter) => {
+    setActiveTimeFilter(timeFilter);
+    setRegionData(null); // Clear region data when filter changes
+  };
+
   const handleSubmitAct = async (formData) => {
     try {
       await actsAPI.create(formData);
@@ -118,6 +152,8 @@ const HomePage = () => {
         <Sidebar
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
+          activeTimeFilter={activeTimeFilter}
+          onTimeFilterChange={handleTimeFilterChange}
           regionData={regionData}
           onSubmitAct={handleSubmitAct}
         />
