@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Act
+from .models import Act, Category
 
 
 class ActSerializer(serializers.ModelSerializer):
@@ -27,7 +27,7 @@ class ActSerializer(serializers.ModelSerializer):
     
     def validate_category(self, value):
         """Validate category is one of the allowed choices"""
-        valid_categories = [choice[0] for choice in Act.Category.choices]
+        valid_categories = [choice[0] for choice in Category.choices]
         if value not in valid_categories:
             raise serializers.ValidationError(f"Category must be one of: {', '.join(valid_categories)}")
         return value
