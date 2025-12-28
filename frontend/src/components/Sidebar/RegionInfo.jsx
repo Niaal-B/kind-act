@@ -1,9 +1,24 @@
 import React from 'react';
 import { formatDate } from '../../utils/helpers';
 import { CATEGORY_LABELS, CATEGORY_ICONS } from '../../utils/constants';
+import { Sparkles, Utensils, Shirt, Clock, Banknote, Gift } from 'lucide-react';
 import './RegionInfo.css';
 
+const ICON_MAP = {
+  Sparkles,
+  Utensils,
+  Shirt,
+  Clock,
+  Banknote,
+  Gift,
+};
+
 const RegionInfo = ({ regionData }) => {
+  const getIcon = (iconName) => {
+    const IconComponent = ICON_MAP[iconName] || Sparkles;
+    return <IconComponent size={16} />;
+  };
+
   if (!regionData) {
     return (
       <div className="region-info">
@@ -15,12 +30,12 @@ const RegionInfo = ({ regionData }) => {
   return (
     <div className="region-info visible">
       <h3 className="region-name">{regionData.city || 'Unknown Region'}</h3>
-      
+
       <div className="info-item">
         <strong>Total Acts:</strong>
         <span>{regionData.total_acts || 0}</span>
       </div>
-      
+
       <div className="info-item">
         <strong>This Week:</strong>
         <span>{regionData.acts_this_week || 0}</span>
@@ -32,7 +47,9 @@ const RegionInfo = ({ regionData }) => {
           <div className="breakdown-list">
             {Object.entries(regionData.category_breakdown).map(([category, count]) => (
               <div key={category} className="breakdown-item">
-                <span className="breakdown-icon">{CATEGORY_ICONS[category]}</span>
+                <span className="breakdown-icon">
+                  {getIcon(CATEGORY_ICONS[category])}
+                </span>
                 <span className="breakdown-label">{CATEGORY_LABELS[category]}</span>
                 <span className="breakdown-count">{count}</span>
               </div>

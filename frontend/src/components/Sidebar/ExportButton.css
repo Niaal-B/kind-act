@@ -1,30 +1,30 @@
 .export-section {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid #e2e8f0;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 1px solid var(--border-color);
 }
 
 .export-section h4 {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
-  color: #2d3748;
-  margin: 0 0 12px 0;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
 }
 
 .export-buttons {
   display: flex;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
 
 .export-btn {
   flex: 1;
-  padding: 10px 16px;
-  border: 2px solid #e2e8f0;
-  background: white;
-  color: #4a5568;
-  border-radius: 8px;
-  font-size: 13px;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -32,40 +32,40 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
+  box-shadow: var(--shadow-sm);
 }
 
 .export-btn:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
+  background: var(--background-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .export-btn.csv {
-  border-color: #48bb78;
-  color: #48bb78;
+  border-color: rgba(16, 185, 129, 0.3);
+  color: var(--success-color);
 }
 
 .export-btn.csv:hover {
-  background: #f0fff4;
-  border-color: #38a169;
+  background: rgba(16, 185, 129, 0.05);
+  border-color: var(--success-color);
 }
 
 .export-btn.json {
-  border-color: #4299e1;
-  color: #4299e1;
+  border-color: rgba(30, 64, 175, 0.3);
+  color: var(--secondary-color);
 }
 
 .export-btn.json:hover {
-  background: #ebf8ff;
-  border-color: #3182ce;
+  background: rgba(30, 64, 175, 0.05);
+  border-color: var(--secondary-color);
 }
 
 .export-info {
   text-align: center;
-  color: #718096;
-  font-size: 12px;
-  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-top: var(--spacing-sm);
 }
 
 @media (max-width: 768px) {
@@ -73,4 +73,3 @@
     flex-direction: column;
   }
 }
-

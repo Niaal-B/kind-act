@@ -7,6 +7,7 @@ import { actsAPI } from '../services/api';
 import api from '../services/api';
 import { CATEGORIES } from '../utils/constants';
 import { TIME_FILTERS } from '../components/Filters/TimeFilter';
+import { LayoutDashboard, ShieldCheck, ArrowLeft } from 'lucide-react';
 import './SantaDashboard.css';
 
 const SantaDashboard = () => {
@@ -15,7 +16,7 @@ const SantaDashboard = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const [acts, setActs] = useState([]);
   const [filteredActs, setFilteredActs] = useState([]);
   const [stats, setStats] = useState(null);
@@ -32,14 +33,14 @@ const SantaDashboard = () => {
       setFilteredActs([]);
       return;
     }
-    
+
     let filtered = [...acts];
-    
+
     // Apply category filter
     if (activeCategory !== CATEGORIES.ALL) {
       filtered = filtered.filter(act => act.category === activeCategory);
     }
-    
+
     // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -50,7 +51,7 @@ const SantaDashboard = () => {
         return cityMatch || countryMatch || descMatch;
       });
     }
-    
+
     // Apply time filter
     if (activeTimeFilter !== TIME_FILTERS.ALL) {
       const now = new Date();
@@ -59,7 +60,7 @@ const SantaDashboard = () => {
       weekAgo.setDate(weekAgo.getDate() - 7);
       const monthAgo = new Date(today);
       monthAgo.setMonth(monthAgo.getMonth() - 1);
-      
+
       filtered = filtered.filter(act => {
         const actDate = new Date(act.created_at);
         switch (activeTimeFilter) {
@@ -74,9 +75,9 @@ const SantaDashboard = () => {
         }
       });
     }
-    
+
     setFilteredActs(filtered);
-    
+
     // If search term and results exist, center map on first result
     if (searchTerm && filtered.length > 0) {
       const firstResult = filtered[0];
@@ -102,8 +103,8 @@ const SantaDashboard = () => {
   const fetchActs = async () => {
     try {
       const response = await actsAPI.getAll();
-      const actsData = Array.isArray(response.data) 
-        ? response.data 
+      const actsData = Array.isArray(response.data)
+        ? response.data
         : (response.data.results || []);
       setActs(actsData);
       setFilteredActs(actsData);
@@ -128,7 +129,7 @@ const SantaDashboard = () => {
 
     try {
       const response = await api.post('/admin/check-password/', { password });
-      
+
       if (response.data.success) {
         setIsAuthenticated(true);
         localStorage.setItem('santa_authenticated', 'true');
@@ -202,7 +203,9 @@ const SantaDashboard = () => {
       <div className="password-container">
         <div className="password-box">
           <div className="password-header">
-            <h1>🎅 Santa's Dashboard</h1>
+            <h1 className="flex items-center justify-center gap-2">
+              <LayoutDashboard size={32} /> Santa's Dashboard
+            </h1>
             <p>Enter password to access advanced analytics</p>
           </div>
           <form onSubmit={handlePasswordSubmit} className="password-form">
@@ -220,8 +223,8 @@ const SantaDashboard = () => {
               {loading ? 'Checking...' : 'Access Dashboard'}
             </button>
           </form>
-          <button onClick={() => navigate('/')} className="back-home">
-            ← Back to Public View
+          <button onClick={() => navigate('/')} className="back-home flex items-center justify-center gap-2">
+            <ArrowLeft size={16} /> Back to Public View
           </button>
         </div>
       </div>
@@ -233,7 +236,9 @@ const SantaDashboard = () => {
     <Layout stats={stats}>
       <div className="santa-dashboard">
         <div className="dashboard-header">
-          <h2>🎅 Santa's Command Center</h2>
+          <h2 className="flex items-center gap-2">
+            <ShieldCheck size={24} /> Admin Dashboard
+          </h2>
           <button onClick={handleLogout} className="logout-btn">
             Logout
           </button>

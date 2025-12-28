@@ -3,7 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { CATEGORY_LABELS, CATEGORY_ICONS } from '../../utils/constants';
 import './AnalyticsPanel.css';
 
-const COLORS = ['#c92a2a', '#4299e1', '#48bb78', '#ed8936', '#9f7aea'];
+// Theme colors: Primary (Rose-800), Secondary (Blue-700), Success (Emerald-600), Warning (Orange-500), Purple
+const COLORS = ['#9F1239', '#1D4ED8', '#059669', '#F97316', '#7C3AED'];
 
 const AnalyticsPanel = ({ stats, acts }) => {
   if (!stats || !acts) return null;
@@ -23,7 +24,7 @@ const AnalyticsPanel = ({ stats, acts }) => {
         cityCounts[act.city] = (cityCounts[act.city] || 0) + 1;
       }
     });
-    
+
     return Object.entries(cityCounts)
       .map(([city, count]) => ({ city, count }))
       .sort((a, b) => b.count - a.count)
@@ -64,8 +65,8 @@ const AnalyticsPanel = ({ stats, acts }) => {
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={topCities}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="city" 
+            <XAxis
+              dataKey="city"
               angle={-45}
               textAnchor="end"
               height={80}
@@ -74,7 +75,7 @@ const AnalyticsPanel = ({ stats, acts }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#c92a2a" name="Acts of Kindness" />
+            <Bar dataKey="count" fill="#9F1239" name="Acts of Kindness" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

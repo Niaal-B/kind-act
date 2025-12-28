@@ -1,51 +1,52 @@
 .time-filter {
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .time-filter .filter-title {
-  font-size: 16px;
+  font-size: 0.9375rem;
   font-weight: 600;
-  margin: 0 0 16px 0;
-  color: #c92a2a;
-  letter-spacing: -0.2px;
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--primary-color);
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
 }
 
 .time-filter .filter-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .time-filter .filter-btn {
-  padding: 8px 16px;
-  border: 2px solid #e2e8f0;
-  background: white;
-  color: #4a5568;
-  border-radius: 20px;
+  padding: 6px 14px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-color);
+  color: var(--text-secondary);
+  border-radius: 100px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   transition: all 0.2s ease;
   outline: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .time-filter .filter-btn:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
+  background: var(--background-color);
+  border-color: var(--text-secondary);
   transform: translateY(-1px);
 }
 
 .time-filter .filter-btn.active {
-  background: linear-gradient(135deg, #4299e1, #3182ce);
-  border-color: #3182ce;
+  background: linear-gradient(135deg, var(--secondary-color), #2563EB);
+  border-color: var(--secondary-color);
   color: white;
-  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+  box-shadow: var(--shadow-md);
 }
 
 .time-filter .filter-btn.active:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+  box-shadow: var(--shadow-lg);
 }
-

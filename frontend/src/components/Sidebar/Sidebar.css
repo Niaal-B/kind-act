@@ -1,41 +1,78 @@
 .sidebar {
-  width: 380px;
-  min-width: 380px;
-  background: white;
-  padding: 24px;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.05);
+  width: 400px;
+  min-width: 400px;
+  background: var(--surface-color);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-lg);
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   height: 100%;
-  order: 2;
+  order: 0;
+  /* Move to left */
+  border-right: 1px solid var(--border-color);
+  /* Change border side */
+  border-left: none;
+  gap: var(--spacing-lg);
+}
+
+/* Custom Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
 
 .submit-btn {
   width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #c92a2a, #e03131);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  font-weight: 700;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(201, 42, 42, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-md);
   margin-top: auto;
 }
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(201, 42, 42, 0.4);
+  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 768px) {
   .sidebar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    max-width: 100%;
+    min-width: 100%;
+    height: 60%;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    transition: transform 0.3s ease-out;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
   }
 }
-

@@ -17,12 +17,13 @@ export const CATEGORY_LABELS = {
   [CATEGORIES.OTHER]: 'Other',
 };
 
+// Icon keys to be mapped to Lucide components
 export const CATEGORY_ICONS = {
-  [CATEGORIES.ALL]: '🌟',
-  [CATEGORIES.FOOD]: '🍽️',
-  [CATEGORIES.CLOTHING]: '👕',
-  [CATEGORIES.TIME]: '⏰',
-  [CATEGORIES.MONEY]: '💰',
-  [CATEGORIES.OTHER]: '🌟',
+  [CATEGORIES.ALL]: 'Sparkles',
+  [CATEGORIES.FOOD]: 'Utensils',
+  [CATEGORIES.CLOTHING]: 'Shirt',
+  [CATEGORIES.TIME]: 'Clock',
+  [CATEGORIES.MONEY]: 'Banknote',
+  [CATEGORIES.OTHER]: 'Gift',
 };
 

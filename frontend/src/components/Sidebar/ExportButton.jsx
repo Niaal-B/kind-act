@@ -1,5 +1,6 @@
 import React from 'react';
 import { exportToCSV, exportToJSON } from '../../utils/export';
+import { Download, FileText, Table } from 'lucide-react';
 import './ExportButton.css';
 
 const ExportButton = ({ acts, stats }) => {
@@ -18,21 +19,21 @@ const ExportButton = ({ acts, stats }) => {
 
   return (
     <div className="export-section">
-      <h4>📥 Export Data</h4>
+      <h4><Download size={18} /> Export Data</h4>
       <div className="export-buttons">
         <button
           className="export-btn csv"
           onClick={() => handleExport('csv')}
           title="Export as CSV"
         >
-          📊 Export CSV
+          <Table size={16} /> Export CSV
         </button>
         <button
           className="export-btn json"
           onClick={() => handleExport('json')}
           title="Export as JSON"
         >
-          📄 Export JSON
+          <FileText size={16} /> Export JSON
         </button>
       </div>
       {stats && (

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Search, X } from 'lucide-react';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch, onClear }) => {
@@ -22,7 +23,7 @@ const SearchBar = ({ onSearch, onClear }) => {
   return (
     <div className="search-bar">
       <div className="search-input-wrapper">
-        <span className="search-icon">🔍</span>
+        <span className="search-icon"><Search size={20} /></span>
         <input
           type="text"
           className="search-input"
@@ -36,7 +37,7 @@ const SearchBar = ({ onSearch, onClear }) => {
             onClick={handleClear}
             aria-label="Clear search"
           >
-            ×
+            <X size={16} />
           </button>
         )}
       </div>

@@ -1,41 +1,41 @@
 .analytics-panel {
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 2px solid #e2e8f0;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-xl);
+  border-top: 2px solid var(--border-color);
 }
 
 .analytics-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 700;
-  color: #2d3748;
-  margin: 0 0 20px 0;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-lg) 0;
 }
 
 .chart-section {
-  margin-bottom: 32px;
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-2xl);
+  background: var(--surface-color);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
 }
 
 .chart-section h4 {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
-  color: #4a5568;
-  margin: 0 0 16px 0;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg) 0;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 
 @media (max-width: 768px) {
   .analytics-panel {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
   }
-  
+
   .chart-section {
-    padding: 12px;
+    padding: var(--spacing-md);
   }
 }
-
