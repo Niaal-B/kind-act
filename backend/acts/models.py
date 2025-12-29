@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Category(models.TextChoices):
@@ -30,6 +31,9 @@ class Act(models.Model):
     )
     city = models.CharField(max_length=100, blank=True, help_text="City name")
     country = models.CharField(max_length=100, blank=True, help_text="Country name")
+    
+    # User relationship
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='acts', help_text="User who submitted this act")
     
     # Trust system (soft validation)
     evidence_url = models.URLField(blank=True, null=True, help_text="Optional evidence/photo URL")
