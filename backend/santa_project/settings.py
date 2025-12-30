@@ -27,7 +27,15 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-1(_cv_asccc1=ee0x--l&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',')])
+# ALLOWED_HOSTS: Allow any .onrender.com subdomain in production, or use env var
+if config('ALLOWED_HOSTS', default=None):
+    ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+elif not DEBUG:
+    # In production (DEBUG=False), allow any .onrender.com subdomain
+    ALLOWED_HOSTS = ['.onrender.com']
+else:
+    # Development defaults
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition

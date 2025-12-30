@@ -41,7 +41,7 @@ This guide will help you deploy the Christmas Tree of Kindness application to Ve
    ```
    SECRET_KEY=<generate-a-secure-random-key>
    DEBUG=False
-   ALLOWED_HOSTS=christmas-backend.onrender.com
+   # ALLOWED_HOSTS is optional - will auto-allow .onrender.com domains if not set
    DATABASE_URL=<your-postgres-internal-url-from-step-2>
    CORS_ALLOWED_ORIGINS=https://your-vercel-app.vercel.app
    CSRF_TRUSTED_ORIGINS=https://your-vercel-app.vercel.app
@@ -49,6 +49,8 @@ This guide will help you deploy the Christmas Tree of Kindness application to Ve
    CSRF_COOKIE_HTTPONLY=True
    GROQ_API_KEY=<your-groq-api-key>
    ```
+   
+   **Note**: If you don't set `ALLOWED_HOSTS`, the app will automatically allow any `.onrender.com` subdomain. You can optionally set it to your specific domain if you prefer.
 
 5. Click "Create Web Service"
 
@@ -57,9 +59,9 @@ This guide will help you deploy the Christmas Tree of Kindness application to Ve
 ### 4. Update Backend Settings
 
 After deployment, update the environment variables in Render:
-- Set `CORS_ALLOWED_ORIGINS` to your Vercel frontend URL
-- Set `CSRF_TRUSTED_ORIGINS` to your Vercel frontend URL
-- Set `ALLOWED_HOSTS` to include your Render backend URL
+- Set `CORS_ALLOWED_ORIGINS` to your Vercel frontend URL (e.g., `https://your-app.vercel.app`)
+- Set `CSRF_TRUSTED_ORIGINS` to your Vercel frontend URL (e.g., `https://your-app.vercel.app`)
+- `ALLOWED_HOSTS` is optional - it will auto-allow `.onrender.com` domains if not set
 
 ## Frontend Deployment (Vercel)
 
