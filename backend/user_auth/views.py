@@ -46,6 +46,8 @@ def register(request):
             first_name=first_name,
             last_name=last_name
         )
+        # Automatically log in the user after registration
+        login(request, user)
         return Response({
             'success': True,
             'message': 'User registered successfully',
