@@ -74,13 +74,13 @@ const removeImageBackground = (imageUrl, callback, isDecoration = false) => {
       const y = Math.floor(pixelIndex / canvas.width);
       const isEdgePixel = x === 0 || x === canvas.width - 1 || y === 0 || y === canvas.height - 1;
       
-      // Only remove pure white/black pixels if they're on edges or match background color
-      // (to avoid removing white/black that's part of the actual tree image)
-      if ((isEdgePixel || colorDiff < 30) && (r === 255 && g === 255 && b === 255)) {
-        data[i + 3] = 0; // Make transparent
+      // For checkerboard patterns, remove ALL pure white and pure black pixels
+      // Checkerboard backgrounds are alternating pure white/black squares
+      if (r === 255 && g === 255 && b === 255) {
+        data[i + 3] = 0; // Remove pure white (checkerboard white squares)
       }
-      else if ((isEdgePixel || colorDiff < 30) && (r === 0 && g === 0 && b === 0)) {
-        data[i + 3] = 0; // Make transparent
+      else if (r === 0 && g === 0 && b === 0) {
+        data[i + 3] = 0; // Remove pure black (checkerboard black squares)
       }
       // Check if pixel is near white (background) - only in edges or if matches background
       else if ((isEdgePixel || colorDiff < 50) && brightness > whiteThreshold && r > whiteThreshold - 15 && g > whiteThreshold - 15 && b > whiteThreshold - 15) {
@@ -94,21 +94,13 @@ const removeImageBackground = (imageUrl, callback, isDecoration = false) => {
       else if (colorDiff < (isDecoration ? 30 : 40)) {
         data[i + 3] = 0; // Make transparent
       }
-      // Check for checkerboard pattern - detect gray/neutral colors (black/white squares)
-      // This catches gray pixels that form checkerboard patterns, but only on edges
-      else if (isEdgePixel && Math.abs(r - g) < 10 && Math.abs(g - b) < 10) {
-        // Very light gray (white squares in checkerboard) - brightness > 200 but not pure white
-        if (brightness > 200 && brightness < 255) {
-          data[i + 3] = 0; // Make transparent
-        }
-        // Very dark gray/black (black squares in checkerboard) - brightness < 100 but not pure black
-        else if (brightness < 100 && brightness > 0) {
-          data[i + 3] = 0; // Make transparent
-        }
-        // Very light neutral colors that are likely backgrounds (brightness > 240)
-        else if (brightness > 240) {
-          data[i + 3] = 0; // Make transparent
-        }
+      // Check for near-white pixels that are likely checkerboard background
+      else if (brightness > 248 && Math.abs(r - g) < 3 && Math.abs(g - b) < 3) {
+        data[i + 3] = 0; // Remove very light gray/white checkerboard squares
+      }
+      // Check for near-black pixels that are likely checkerboard background
+      else if (brightness < 7 && Math.abs(r - g) < 3 && Math.abs(g - b) < 3) {
+        data[i + 3] = 0; // Remove very dark gray/black checkerboard squares
       }
     }
     
@@ -299,15 +291,15 @@ const TreeCanvas = ({
       
       img.onload = () => {
         console.log('Tree image loaded:', imagePath);
-        // Temporarily use original image directly to ensure tree loads
-        // Background removal can be re-enabled later if needed
-        setTreeImage(imagePath);
-      };
-      
-      img.onerror = (error) => {
-        console.error('Tree image failed to load:', imagePath, error);
-        // Use placeholder if image not found
-        setTreeImage(createTreePlaceholder());
+        // Process tree image to remove checkerboard/white/black backgrounds
+        removeImageBackground(imagePath, (processedImage) => {
+          if (processedImage) {
+            setTreeImage(processedImage);
+          } else {
+            // Fallback to original if processing fails
+            setTreeImage(imagePath);
+          }
+        }, false);
       };
       
       img.onerror = () => {
