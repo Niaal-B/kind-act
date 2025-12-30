@@ -1,0 +1,2 @@
+web: gunicorn santa_project.wsgi:application
+
