@@ -37,10 +37,27 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Login failed',
-      };
+      console.error('Login error:', error);
+      if (error.response) {
+        const errorMessage = error.response.data?.error || 
+                           error.response.data?.message || 
+                           error.response.data?.detail ||
+                           `Server error: ${error.response.status}`;
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      } else if (error.request) {
+        return {
+          success: false,
+          error: 'Cannot connect to server. Please check your internet connection and try again.',
+        };
+      } else {
+        return {
+          success: false,
+          error: error.message || 'Login failed. Please try again.',
+        };
+      }
     }
   };
 
@@ -50,10 +67,31 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data.user);
       return { success: true, data: response.data };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Registration failed',
-      };
+      console.error('Registration error:', error);
+      // Provide more detailed error messages
+      if (error.response) {
+        // Server responded with error status
+        const errorMessage = error.response.data?.error || 
+                           error.response.data?.message || 
+                           error.response.data?.detail ||
+                           `Server error: ${error.response.status}`;
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      } else if (error.request) {
+        // Request was made but no response received
+        return {
+          success: false,
+          error: 'Cannot connect to server. Please check your internet connection and try again.',
+        };
+      } else {
+        // Something else happened
+        return {
+          success: false,
+          error: error.message || 'Failed to create account. Please try again.',
+        };
+      }
     }
   };
 
