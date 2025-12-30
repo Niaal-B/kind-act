@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../services/api';
+import { authAPI, setTokens, clearTokens, getAccessToken, getRefreshToken } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -21,10 +21,20 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
+    // Check if we have a token
+    const token = getAccessToken();
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await authAPI.getCurrentUser();
       setUser(response.data);
     } catch (error) {
+      // Token might be invalid, clear it
+      clearTokens();
       setUser(null);
     } finally {
       setLoading(false);
@@ -34,6 +44,8 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       const response = await authAPI.login({ username, password });
+      // Store JWT tokens
+      setTokens(response.data.access, response.data.refresh);
       setUser(response.data.user);
       return { success: true, data: response.data };
     } catch (error) {
@@ -97,11 +109,15 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authAPI.logout();
-      setUser(null);
-      return { success: true };
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        await authAPI.logout({ refresh: refreshToken });
+      }
     } catch (error) {
-      // Even if logout fails, clear user state
+      console.error('Logout error:', error);
+    } finally {
+      // Always clear tokens and user state
+      clearTokens();
       setUser(null);
       return { success: true };
     }

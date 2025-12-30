@@ -97,7 +97,7 @@ export const authAPI = {
   login: (data) => api.post('/auth/login/', data),
 
   // Logout user
-  logout: () => api.post('/auth/logout/'),
+  logout: (data) => api.post('/auth/logout/', data),
 
   // Get current user
   getCurrentUser: () => api.get('/auth/current-user/'),

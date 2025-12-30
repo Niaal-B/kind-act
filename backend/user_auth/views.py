@@ -2,14 +2,11 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.middleware.csrf import get_token
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -46,8 +43,8 @@ def register(request):
             first_name=first_name,
             last_name=last_name
         )
-        # Automatically log in the user after registration
-        login(request, user)
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
         return Response({
             'success': True,
             'message': 'User registered successfully',
@@ -57,7 +54,9 @@ def register(request):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-            }
+            },
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
         }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response(
@@ -66,7 +65,6 @@ def register(request):
         )
 
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -83,7 +81,8 @@ def login_view(request):
     user = authenticate(request, username=username, password=password)
     
     if user is not None:
-        login(request, user)
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
         return Response({
             'success': True,
             'message': 'Login successful',
@@ -93,7 +92,9 @@ def login_view(request):
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
-            }
+            },
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
         })
     else:
         return Response(
@@ -102,16 +103,25 @@ def login_view(request):
         )
 
 
-@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    """Logout the current user"""
-    logout(request)
-    return Response({
-        'success': True,
-        'message': 'Logout successful'
-    })
+    """Logout the current user (blacklist refresh token)"""
+    try:
+        refresh_token = request.data.get('refresh')
+        if refresh_token:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        return Response({
+            'success': True,
+            'message': 'Logout successful'
+        })
+    except Exception as e:
+        # Even if token blacklist fails, return success
+        return Response({
+            'success': True,
+            'message': 'Logout successful'
+        })
 
 
 @api_view(['GET'])
