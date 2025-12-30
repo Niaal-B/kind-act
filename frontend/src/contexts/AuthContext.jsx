@@ -76,6 +76,10 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const response = await authAPI.register(userData);
+      // Store JWT tokens
+      if (response.data.access && response.data.refresh) {
+        setTokens(response.data.access, response.data.refresh);
+      }
       setUser(response.data.user);
       return { success: true, data: response.data };
     } catch (error) {

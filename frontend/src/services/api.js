@@ -7,35 +7,35 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Important for session authentication
 });
 
-// Get CSRF token and set it for all requests
-let csrfToken = null;
-
-const getCsrfToken = async () => {
-  if (!csrfToken) {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/auth/csrf-token/`, {
-        withCredentials: true,
-      });
-      csrfToken = response.data.csrfToken;
-    } catch (error) {
-      console.error('Error fetching CSRF token:', error);
-    }
-  }
-  return csrfToken;
+// Get JWT token from localStorage
+const getAccessToken = () => {
+  return localStorage.getItem('accessToken');
 };
 
-// Request interceptor to add CSRF token
+const getRefreshToken = () => {
+  return localStorage.getItem('refreshToken');
+};
+
+const setTokens = (access, refresh) => {
+  localStorage.setItem('accessToken', access);
+  if (refresh) {
+    localStorage.setItem('refreshToken', refresh);
+  }
+};
+
+const clearTokens = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+};
+
+// Request interceptor to add JWT token
 api.interceptors.request.use(
-  async (config) => {
-    // Only add CSRF token for state-changing methods
-    if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
-      const token = await getCsrfToken();
-      if (token) {
-        config.headers['X-CSRFToken'] = token;
-      }
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -44,22 +44,44 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor to refresh CSRF token on 403
+// Response interceptor to handle token refresh on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 403 && error.response?.data?.detail?.includes('CSRF')) {
-      // Refresh CSRF token and retry
-      csrfToken = null;
-      const token = await getCsrfToken();
-      if (token && error.config) {
-        error.config.headers['X-CSRFToken'] = token;
-        return api.request(error.config);
+    const originalRequest = error.config;
+
+    // If 401 and we haven't already tried to refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          const response = await axios.post(`${API_BASE_URL}/auth/token/refresh/`, {
+            refresh: refreshToken,
+          });
+
+          const { access } = response.data;
+          setTokens(access, refreshToken);
+
+          // Retry original request with new token
+          originalRequest.headers.Authorization = `Bearer ${access}`;
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        // Refresh failed, clear tokens and redirect to login
+        clearTokens();
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );
+
+// Export token management functions
+export { setTokens, clearTokens, getAccessToken, getRefreshToken };
 
 // Acts API
 export const actsAPI = {
@@ -131,4 +153,3 @@ export const chatAPI = {
 };
 
 export default api;
-
