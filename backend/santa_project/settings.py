@@ -180,6 +180,13 @@ REST_FRAMEWORK = {
 CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=False, cast=bool)  # True in production with HTTPS
 CSRF_COOKIE_HTTPONLY = config('CSRF_COOKIE_HTTPONLY', default=False, cast=bool)
 CSRF_USE_SESSIONS = config('CSRF_USE_SESSIONS', default=False, cast=bool)
+CSRF_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'  # Allow cross-origin cookies in production
+
+# Session cookie settings for cross-origin support
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=False, cast=bool)  # True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'  # Allow cross-origin cookies in production
+SESSION_COOKIE_AGE = 86400  # 24 hours
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = config(
