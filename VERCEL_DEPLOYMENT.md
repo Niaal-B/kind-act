@@ -39,7 +39,7 @@ Vercel should auto-detect Vite, but verify these settings:
 
 #### Build Settings:
 - **Build Command**: `npm run build` (should be pre-filled)
-- **Output Directory**: `dist` (should be pre-filled)
+- **Output Directory**: `build` (Vite outputs to build directory by default)
 - **Install Command**: `npm install` (should be pre-filled)
 
 ### Step 5: Configure Environment Variables

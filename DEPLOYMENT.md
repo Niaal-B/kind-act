@@ -79,7 +79,7 @@ After deployment, update the environment variables in Render:
    - **Framework Preset**: Vite
    - **Root Directory**: `frontend`
    - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
+   - **Output Directory**: `build`
    - **Install Command**: `npm install`
 
 5. Add Environment Variable:
