@@ -22,7 +22,8 @@ const DECORATION_IMAGES = {
 // Function to remove white/black backgrounds from images
 const removeImageBackground = (imageUrl, callback, isDecoration = false) => {
   const img = new Image();
-  img.crossOrigin = 'anonymous';
+  // Don't set crossOrigin for same-origin images (local files)
+  // img.crossOrigin = 'anonymous';
   
   img.onload = () => {
     const canvas = document.createElement('canvas');
@@ -67,25 +68,47 @@ const removeImageBackground = (imageUrl, callback, isDecoration = false) => {
       // Calculate color difference from corner (background) color
       const colorDiff = Math.abs(r - avgR) + Math.abs(g - avgG) + Math.abs(b - avgB);
       
-      // Check if pixel is near white (background)
-      if (brightness > whiteThreshold && r > whiteThreshold - 15 && g > whiteThreshold - 15 && b > whiteThreshold - 15) {
+      // Calculate pixel position to check if it's on the edge
+      const pixelIndex = i / 4;
+      const x = pixelIndex % canvas.width;
+      const y = Math.floor(pixelIndex / canvas.width);
+      const isEdgePixel = x === 0 || x === canvas.width - 1 || y === 0 || y === canvas.height - 1;
+      
+      // Only remove pure white/black pixels if they're on edges or match background color
+      // (to avoid removing white/black that's part of the actual tree image)
+      if ((isEdgePixel || colorDiff < 30) && (r === 255 && g === 255 && b === 255)) {
         data[i + 3] = 0; // Make transparent
       }
-      // Check if pixel is near black (background)
-      else if (brightness < blackThreshold && r < blackThreshold + 15 && g < blackThreshold + 15 && b < blackThreshold + 15) {
+      else if ((isEdgePixel || colorDiff < 30) && (r === 0 && g === 0 && b === 0)) {
+        data[i + 3] = 0; // Make transparent
+      }
+      // Check if pixel is near white (background) - only in edges or if matches background
+      else if ((isEdgePixel || colorDiff < 50) && brightness > whiteThreshold && r > whiteThreshold - 15 && g > whiteThreshold - 15 && b > whiteThreshold - 15) {
+        data[i + 3] = 0; // Make transparent
+      }
+      // Check if pixel is near black (background) - only in edges or if matches background
+      else if ((isEdgePixel || colorDiff < 50) && brightness < blackThreshold && r < blackThreshold + 15 && g < blackThreshold + 15 && b < blackThreshold + 15) {
         data[i + 3] = 0; // Make transparent
       }
       // Check if pixel matches corner background color (within tolerance)
-      else if (isDecoration && colorDiff < 30) {
+      else if (colorDiff < (isDecoration ? 30 : 40)) {
         data[i + 3] = 0; // Make transparent
       }
-      // Check for checkerboard pattern (gray pixels that might be transparency indicator)
-      else if (Math.abs(r - g) < 5 && Math.abs(g - b) < 5 && (brightness > 240 || brightness < 20)) {
-        data[i + 3] = 0; // Make transparent
-      }
-      // Additional check: very light colors that are likely backgrounds
-      else if (brightness > 240 && Math.abs(r - g) < 10 && Math.abs(g - b) < 10) {
-        data[i + 3] = 0; // Make transparent
+      // Check for checkerboard pattern - detect gray/neutral colors (black/white squares)
+      // This catches gray pixels that form checkerboard patterns, but only on edges
+      else if (isEdgePixel && Math.abs(r - g) < 10 && Math.abs(g - b) < 10) {
+        // Very light gray (white squares in checkerboard) - brightness > 200 but not pure white
+        if (brightness > 200 && brightness < 255) {
+          data[i + 3] = 0; // Make transparent
+        }
+        // Very dark gray/black (black squares in checkerboard) - brightness < 100 but not pure black
+        else if (brightness < 100 && brightness > 0) {
+          data[i + 3] = 0; // Make transparent
+        }
+        // Very light neutral colors that are likely backgrounds (brightness > 240)
+        else if (brightness > 240) {
+          data[i + 3] = 0; // Make transparent
+        }
       }
     }
     
@@ -275,11 +298,20 @@ const TreeCanvas = ({
       const img = new Image();
       
       img.onload = () => {
-        // Use tree image directly without background removal (trees usually have proper backgrounds)
+        console.log('Tree image loaded:', imagePath);
+        // Temporarily use original image directly to ensure tree loads
+        // Background removal can be re-enabled later if needed
         setTreeImage(imagePath);
       };
       
+      img.onerror = (error) => {
+        console.error('Tree image failed to load:', imagePath, error);
+        // Use placeholder if image not found
+        setTreeImage(createTreePlaceholder());
+      };
+      
       img.onerror = () => {
+        console.error('Tree image failed to load:', imagePath);
         // Use placeholder if image not found
         setTreeImage(createTreePlaceholder());
       };
@@ -427,6 +459,10 @@ const TreeCanvas = ({
             src={treeImage} 
             alt="Christmas Tree"
             className="tree-image"
+            onError={(e) => {
+              console.error('Error loading tree image:', treeImage);
+              e.target.style.display = 'none';
+            }}
           />
         )}
         {/* Grid overlay (optional visual guide) */}
