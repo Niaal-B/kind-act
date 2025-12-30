@@ -124,5 +124,11 @@ export const treeAPI = {
   autoDecorate: (actId) => api.post('/tree/decorations/auto_decorate/', { act_id: actId }),
 };
 
+// Chat API
+export const chatAPI = {
+  getHistory: () => api.get('/chat/history/'),
+  sendMessage: (message) => api.post('/chat/send/', { message }),
+};
+
 export default api;
 

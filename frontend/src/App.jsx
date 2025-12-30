@@ -7,6 +7,7 @@ import AddActPageRoute from './pages/AddActPageRoute';
 import MyTreePage from './pages/MyTreePage';
 import SantaDashboard from './pages/SantaDashboard';
 import SantaStats from './pages/SantaStats';
+import ChatWithSantaPage from './pages/ChatWithSantaPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyTreePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/chat" 
+            element={
+              <ProtectedRoute>
+                <ChatWithSantaPage />
               </ProtectedRoute>
             } 
           />

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Map, Plus, Gift, LogIn, LogOut, User, TreePine } from 'lucide-react';
+import { Map, Plus, Gift, LogIn, LogOut, User, TreePine, MessageCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './PublicNavigationSidebar.css';
@@ -19,6 +19,7 @@ const PublicNavigationSidebar = () => {
   const navItems = [
     { path: '/', icon: Map, label: 'Map' },
     ...(isAuthenticated ? [{ path: '/my-tree', icon: TreePine, label: 'My Tree' }] : []),
+    ...(isAuthenticated ? [{ path: '/chat', icon: MessageCircle, label: 'Chat with Santa' }] : []),
     ...(isAuthenticated 
       ? [{ path: '/add-act', icon: Plus, label: 'Add Act' }]
       : [{ path: '/login', icon: LogIn, label: 'Login to Add Act', isAction: true }]
