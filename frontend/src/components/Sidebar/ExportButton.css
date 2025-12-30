@@ -42,22 +42,22 @@
 }
 
 .export-btn.csv {
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(22, 163, 74, 0.3);
   color: var(--success-color);
 }
 
 .export-btn.csv:hover {
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(22, 163, 74, 0.05);
   border-color: var(--success-color);
 }
 
 .export-btn.json {
-  border-color: rgba(30, 64, 175, 0.3);
+  border-color: rgba(22, 163, 74, 0.3);
   color: var(--secondary-color);
 }
 
 .export-btn.json:hover {
-  background: rgba(30, 64, 175, 0.05);
+  background: rgba(22, 163, 74, 0.05);
   border-color: var(--secondary-color);
 }
 

@@ -40,7 +40,7 @@
 }
 
 .time-filter .filter-btn.active {
-  background: linear-gradient(135deg, var(--secondary-color), #2563EB);
+  background: linear-gradient(135deg, var(--secondary-color), var(--secondary-hover));
   border-color: var(--secondary-color);
   color: white;
   box-shadow: var(--shadow-md);

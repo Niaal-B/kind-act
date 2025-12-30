@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'acts',
     'admin_auth',
     'user_auth',
+    'tree',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'santa_project.middleware.DisableCSRFForAPI',  # Disable CSRF for API endpoints
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -142,6 +144,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 100,
 }
 
+# Disable CSRF for API views (since we're using SessionAuthentication for REST API)
+# In production, consider using Token authentication instead
+CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
+CSRF_COOKIE_HTTPONLY = False
+CSRF_USE_SESSIONS = False
+
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -149,3 +157,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF settings
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]

@@ -1,4 +1,8 @@
 .analytics-panel {
+  width: 100%;
+}
+
+.analytics-panel:not(.standalone) {
   margin-top: var(--spacing-xl);
   padding-top: var(--spacing-xl);
   border-top: 2px solid var(--border-color);

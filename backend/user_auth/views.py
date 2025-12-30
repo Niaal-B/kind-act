@@ -6,8 +6,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.middleware.csrf import get_token
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
@@ -62,6 +64,7 @@ def register(request):
         )
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_view(request):
@@ -97,6 +100,7 @@ def login_view(request):
         )
 
 
+@csrf_exempt
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
@@ -119,4 +123,13 @@ def current_user(request):
         'email': user.email,
         'first_name': user.first_name,
         'last_name': user.last_name,
+    })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_csrf_token(request):
+    """Get CSRF token for frontend"""
+    return Response({
+        'csrfToken': get_token(request)
     })

@@ -1,96 +1,96 @@
-.app-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
-  color: var(--surface-color);
-  padding: var(--spacing-xl) var(--spacing-2xl);
-  box-shadow: var(--shadow-md);
-  position: relative;
-  z-index: 100;
-  transition: all 0.3s ease;
+.layout-header {
+  border-bottom: 1px solid var(--border-color);
+  background: var(--surface-color);
+}
+
+.header-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-xl);
 }
 
 .header-content {
-  max-width: 1400px;
-  margin: 0 auto;
-  position: relative;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: var(--spacing-lg);
 }
 
-.header-title {
-  display: flex;
-  flex-direction: column;
-}
-
-.title-row {
+.header-left {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xs);
 }
 
 .header-icon {
-  color: white;
+  width: 24px;
+  height: 24px;
+  color: var(--primary-color);
+  flex-shrink: 0;
 }
 
-.header-title h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--surface-color);
-  letter-spacing: -0.025em;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.header-title p {
-  font-size: 0.95rem;
-  opacity: 0.9;
-  margin: 0;
-  font-weight: 400;
-}
-
-.dashboard-link {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--surface-color);
-  text-decoration: none;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(4px);
-}
-
-.dashboard-link:hover {
-  background: rgba(255, 255, 255, 0.25);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.stats-bar {
+.header-text {
   display: flex;
-  gap: var(--spacing-xl);
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.header-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.header-link {
+  display: inline-flex;
   align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.header-link:hover {
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.header-link-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.header-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.9);
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
 }
 
 .stat-content {
@@ -99,44 +99,31 @@
 }
 
 .stat-value {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
   line-height: 1.2;
-  color: var(--surface-color);
 }
 
 .stat-label {
   font-size: 0.75rem;
-  opacity: 0.9;
-  font-weight: 500;
-  margin-top: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  line-height: 1.2;
 }
 
 @media (max-width: 768px) {
-  .app-header {
-    padding: var(--spacing-lg);
-  }
-
   .header-content {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--spacing-md);
   }
 
-  .header-title h1 {
-    font-size: 1.5rem;
-  }
-
-  .stats-bar {
+  .header-stats {
     width: 100%;
-    gap: var(--spacing-md);
-    overflow-x: auto;
-    padding-bottom: var(--spacing-xs);
+    justify-content: space-between;
   }
 
   .stat-item {
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
   }
 }

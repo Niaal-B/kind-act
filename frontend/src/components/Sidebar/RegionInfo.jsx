@@ -20,15 +20,11 @@ const RegionInfo = ({ regionData }) => {
   };
 
   if (!regionData) {
-    return (
-      <div className="region-info">
-        <p className="region-info-empty">Click on the map to see region details</p>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="region-info visible">
+    <div className="region-info">
       <h3 className="region-name">{regionData.city || 'Unknown Region'}</h3>
 
       <div className="info-item">

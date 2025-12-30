@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout/Layout';
+import PublicNavigationSidebar from '../components/Navigation/PublicNavigationSidebar';
 import MapView from '../components/Map/MapView';
-import Sidebar from '../components/Sidebar/Sidebar';
+import FilterPanel from '../components/Filters/FilterPanel';
+import FilterToggle from '../components/Dashboard/FilterToggle';
+import ActDetails from '../components/Map/ActDetails';
 import { actsAPI } from '../services/api';
 import { CATEGORIES } from '../utils/constants';
 import { TIME_FILTERS } from '../components/Filters/TimeFilter';
@@ -11,7 +14,6 @@ const HomePage = () => {
   const [acts, setActs] = useState([]);
   const [filteredActs, setFilteredActs] = useState([]);
   const [stats, setStats] = useState(null);
-  const [regionData, setRegionData] = useState(null);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES.ALL);
   const [activeTimeFilter, setActiveTimeFilter] = useState(TIME_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,14 +21,15 @@ const HomePage = () => {
   const [mapZoom, setMapZoom] = useState(2);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [nearbyActs, setNearbyActs] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  // Fetch acts and stats on mount
   useEffect(() => {
     fetchActs();
     fetchStats();
   }, []);
 
-  // Filter acts when category, time filter, or search term changes
   useEffect(() => {
     if (!Array.isArray(acts)) {
       setFilteredActs([]);
@@ -35,7 +38,6 @@ const HomePage = () => {
     
     let filtered = [...acts];
     
-    // Apply search filter
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(act => {
@@ -46,12 +48,10 @@ const HomePage = () => {
       });
     }
     
-    // Apply category filter
     if (activeCategory !== CATEGORIES.ALL) {
       filtered = filtered.filter(act => act.category === activeCategory);
     }
     
-    // Apply time filter
     if (activeTimeFilter !== TIME_FILTERS.ALL) {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -77,7 +77,6 @@ const HomePage = () => {
     
     setFilteredActs(filtered);
     
-    // If search term and results exist, center map on first result
     if (searchTerm && filtered.length > 0) {
       const firstResult = filtered[0];
       setMapCenter([parseFloat(firstResult.latitude), parseFloat(firstResult.longitude)]);
@@ -89,7 +88,6 @@ const HomePage = () => {
     try {
       setLoading(true);
       const response = await actsAPI.getAll();
-      // Handle paginated response (response.data.results) or direct array (response.data)
       const actsData = Array.isArray(response.data) 
         ? response.data 
         : (response.data.results || []);
@@ -117,92 +115,147 @@ const HomePage = () => {
 
   const handleMapClick = async (coords) => {
     try {
-      const response = await actsAPI.getRegion({
+      const nearbyResponse = await actsAPI.nearbyActs({
         lat: coords.lat,
         lng: coords.lng,
+        radius: 0.05,
       });
-      setRegionData(response.data);
+      
+      if (nearbyResponse.data.acts && nearbyResponse.data.acts.length > 0) {
+        setNearbyActs(nearbyResponse.data.acts);
+        setSelectedLocation(coords);
+      } else {
+        const response = await actsAPI.getRegion({
+          lat: coords.lat,
+          lng: coords.lng,
+        });
+        
+        if (response.data.recent_acts && response.data.recent_acts.length > 0) {
+          setNearbyActs(response.data.recent_acts);
+          setSelectedLocation(coords);
+        } else {
+          setNearbyActs([]);
+          setSelectedLocation(null);
+        }
+      }
     } catch (err) {
-      console.error('Error fetching region data:', err);
+      console.error('Error fetching nearby acts:', err);
+      try {
+        const response = await actsAPI.getRegion({
+          lat: coords.lat,
+          lng: coords.lng,
+        });
+        if (response.data.recent_acts && response.data.recent_acts.length > 0) {
+          setNearbyActs(response.data.recent_acts);
+          setSelectedLocation(coords);
+        }
+      } catch (regionErr) {
+        console.error('Error fetching region data:', regionErr);
+      }
     }
   };
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
-    setRegionData(null); // Clear region data when filter changes
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleTimeFilterChange = (timeFilter) => {
     setActiveTimeFilter(timeFilter);
-    setRegionData(null); // Clear region data when filter changes
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleSearch = (term) => {
     setSearchTerm(term);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleSearchClear = () => {
     setSearchTerm('');
     setMapCenter([20, 0]);
     setMapZoom(2);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
-  const handleSubmitAct = async (formData) => {
-    try {
-      await actsAPI.create(formData);
-      // Refresh acts and stats
-      await fetchActs();
-      await fetchStats();
-      setRegionData(null); // Clear region data
-    } catch (err) {
-      console.error('Error submitting act:', err);
-      throw err; // Re-throw to let form handle error
-    }
+  const handleCloseActDetails = () => {
+    setNearbyActs([]);
+    setSelectedLocation(null);
+  };
+
+  const getFilterCount = () => {
+    let count = 0;
+    if (activeCategory !== CATEGORIES.ALL) count++;
+    if (activeTimeFilter !== TIME_FILTERS.ALL) count++;
+    if (searchTerm) count++;
+    return count;
   };
 
   if (loading && acts.length === 0) {
     return (
-      <Layout>
-        <div className="loading-container">
-          <div className="loading-spinner"></div>
-          <p>Loading acts of kindness...</p>
+      <div className="home-page">
+        <PublicNavigationSidebar />
+        <div className="home-content">
+          <Layout stats={stats}>
+            <div className="loading-wrapper">
+              <div className="loading-spinner" />
+              <p className="loading-text">Loading acts of kindness...</p>
+            </div>
+          </Layout>
         </div>
-      </Layout>
+      </div>
     );
   }
 
   return (
-    <Layout stats={stats}>
-      <div className="home-page">
-        <div className="map-section">
-          <MapView
-            acts={filteredActs}
-            onMapClick={handleMapClick}
-            center={mapCenter}
-            zoom={mapZoom}
-          />
-        </div>
-        <Sidebar
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-          activeTimeFilter={activeTimeFilter}
-          onTimeFilterChange={handleTimeFilterChange}
-          regionData={regionData}
-          onSubmitAct={handleSubmitAct}
-          onSearch={handleSearch}
-          onSearchClear={handleSearchClear}
-        />
+    <div className="home-page">
+      <PublicNavigationSidebar />
+      
+      <div className="home-content">
+        <Layout stats={stats}>
+          <div className="map-container">
+            <FilterToggle
+              onClick={() => setFilterPanelOpen(true)}
+              filterCount={getFilterCount()}
+            />
+            <div className="map-wrapper">
+              <MapView
+                acts={filteredActs}
+                onMapClick={handleMapClick}
+                center={mapCenter}
+                zoom={mapZoom}
+              />
+              {nearbyActs.length > 0 && (
+                <ActDetails
+                  acts={nearbyActs}
+                  location={selectedLocation}
+                  onClose={handleCloseActDetails}
+                />
+              )}
+            </div>
+            <FilterPanel
+              isOpen={filterPanelOpen}
+              onClose={() => setFilterPanelOpen(false)}
+              activeCategory={activeCategory}
+              onCategoryChange={handleCategoryChange}
+              activeTimeFilter={activeTimeFilter}
+              onTimeFilterChange={handleTimeFilterChange}
+              onSearch={handleSearch}
+              onSearchClear={handleSearchClear}
+            />
+          </div>
+          {error && (
+            <div className="error-banner">
+              {error}
+            </div>
+          )}
+        </Layout>
       </div>
-      {error && (
-        <div className="error-banner">
-          {error}
-        </div>
-      )}
-    </Layout>
+    </div>
   );
 };
 
 export default HomePage;
-

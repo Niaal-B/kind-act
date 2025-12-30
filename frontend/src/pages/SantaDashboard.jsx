@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../components/Layout/Layout';
 import MapView from '../components/Map/MapView';
-import Sidebar from '../components/Sidebar/Sidebar';
+import NavigationSidebar from '../components/Navigation/NavigationSidebar';
+import FilterPanel from '../components/Filters/FilterPanel';
+import FilterToggle from '../components/Dashboard/FilterToggle';
+import AnalyticsPanel from '../components/Sidebar/AnalyticsPanel';
+import ExportButton from '../components/Sidebar/ExportButton';
+import ActDetails from '../components/Map/ActDetails';
 import { actsAPI } from '../services/api';
 import api from '../services/api';
 import { CATEGORIES } from '../utils/constants';
 import { TIME_FILTERS } from '../components/Filters/TimeFilter';
-import { LayoutDashboard, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, ArrowLeft } from 'lucide-react';
 import './SantaDashboard.css';
 
 const SantaDashboard = () => {
@@ -16,16 +20,19 @@ const SantaDashboard = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeView, setActiveView] = useState('map'); // 'map' or 'stats'
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   const [acts, setActs] = useState([]);
   const [filteredActs, setFilteredActs] = useState([]);
   const [stats, setStats] = useState(null);
-  const [regionData, setRegionData] = useState(null);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES.ALL);
   const [activeTimeFilter, setActiveTimeFilter] = useState(TIME_FILTERS.ALL);
   const [searchTerm, setSearchTerm] = useState('');
   const [mapCenter, setMapCenter] = useState([20, 0]);
   const [mapZoom, setMapZoom] = useState(2);
+  const [nearbyActs, setNearbyActs] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   // Filter acts when category or time filter changes
   useEffect(() => {
@@ -79,12 +86,12 @@ const SantaDashboard = () => {
     setFilteredActs(filtered);
 
     // If search term and results exist, center map on first result
-    if (searchTerm && filtered.length > 0) {
+    if (searchTerm && filtered.length > 0 && activeView === 'map') {
       const firstResult = filtered[0];
       setMapCenter([parseFloat(firstResult.latitude), parseFloat(firstResult.longitude)]);
       setMapZoom(8);
     }
-  }, [acts, activeCategory, activeTimeFilter, searchTerm]);
+  }, [acts, activeCategory, activeTimeFilter, searchTerm, activeView]);
 
   // Check if already authenticated (simple session check)
   useEffect(() => {
@@ -153,48 +160,88 @@ const SantaDashboard = () => {
 
   const handleMapClick = async (coords) => {
     try {
-      const response = await actsAPI.getRegion({
+      // First try to fetch nearby acts
+      const nearbyResponse = await actsAPI.nearbyActs({
         lat: coords.lat,
         lng: coords.lng,
+        radius: 0.05, // ~5km radius (increased for better results)
       });
-      setRegionData(response.data);
+      
+      if (nearbyResponse.data.acts && nearbyResponse.data.acts.length > 0) {
+        setNearbyActs(nearbyResponse.data.acts);
+        setSelectedLocation(coords);
+      } else {
+        // If no nearby acts, get region data and use recent_acts for Instagram display
+        const response = await actsAPI.getRegion({
+          lat: coords.lat,
+          lng: coords.lng,
+        });
+        
+        // Use recent_acts from region data for Instagram-style display
+        if (response.data.recent_acts && response.data.recent_acts.length > 0) {
+          setNearbyActs(response.data.recent_acts);
+          setSelectedLocation(coords);
+        } else {
+          // No acts at all, clear everything
+          setNearbyActs([]);
+          setSelectedLocation(null);
+        }
+      }
     } catch (err) {
-      console.error('Error fetching region data:', err);
+      console.error('Error fetching nearby acts:', err);
+      // On error, try region endpoint as fallback
+      try {
+        const response = await actsAPI.getRegion({
+          lat: coords.lat,
+          lng: coords.lng,
+        });
+        if (response.data.recent_acts && response.data.recent_acts.length > 0) {
+          setNearbyActs(response.data.recent_acts);
+          setSelectedLocation(coords);
+        }
+      } catch (regionErr) {
+        console.error('Error fetching region data:', regionErr);
+      }
     }
   };
 
   const handleCategoryChange = (category) => {
     setActiveCategory(category);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleTimeFilterChange = (timeFilter) => {
     setActiveTimeFilter(timeFilter);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleSearch = (term) => {
     setSearchTerm(term);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
   const handleSearchClear = () => {
     setSearchTerm('');
     setMapCenter([20, 0]);
     setMapZoom(2);
-    setRegionData(null);
+    setNearbyActs([]);
+    setSelectedLocation(null);
   };
 
-  const handleSubmitAct = async (formData) => {
-    try {
-      await actsAPI.create(formData);
-      await fetchActs();
-      await fetchStats();
-      setRegionData(null);
-    } catch (err) {
-      console.error('Error submitting act:', err);
-      throw err;
-    }
+  const handleCloseActDetails = () => {
+    setNearbyActs([]);
+    setSelectedLocation(null);
+  };
+
+  const getFilterCount = () => {
+    let count = 0;
+    if (activeCategory !== CATEGORIES.ALL) count++;
+    if (activeTimeFilter !== TIME_FILTERS.ALL) count++;
+    if (searchTerm) count++;
+    return count;
   };
 
   // Password form if not authenticated
@@ -233,43 +280,84 @@ const SantaDashboard = () => {
 
   // Dashboard view if authenticated
   return (
-    <Layout stats={stats}>
-      <div className="santa-dashboard">
-        <div className="dashboard-header">
-          <h2 className="flex items-center gap-2">
-            <ShieldCheck size={24} /> Admin Dashboard
-          </h2>
-          <button onClick={handleLogout} className="logout-btn">
-            Logout
-          </button>
-        </div>
-        <div className="home-page">
-          <div className="map-section">
-            <MapView
-              acts={filteredActs}
-              onMapClick={handleMapClick}
-              center={mapCenter}
-              zoom={mapZoom}
+    <div className="santa-dashboard-container">
+      <NavigationSidebar
+        activeView={activeView}
+        onViewChange={setActiveView}
+        onLogout={handleLogout}
+      />
+      
+      <div className="dashboard-main-content">
+        {activeView === 'map' && (
+          <>
+            <FilterToggle
+              onClick={() => setFilterPanelOpen(true)}
+              filterCount={getFilterCount()}
             />
+            <div className="map-view-container">
+              <MapView
+                acts={filteredActs}
+                onMapClick={handleMapClick}
+                center={mapCenter}
+                zoom={mapZoom}
+              />
+              {nearbyActs.length > 0 && (
+                <ActDetails
+                  acts={nearbyActs}
+                  location={selectedLocation}
+                  onClose={handleCloseActDetails}
+                />
+              )}
+            </div>
+          </>
+        )}
+
+        {activeView === 'stats' && (
+          <div className="stats-view-container">
+            {stats && (
+              <div className="stats-overview">
+                <div className="stat-card">
+                  <div className="stat-value">{stats.total_acts || 0}</div>
+                  <div className="stat-label">Total Acts</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">{stats.total_cities || 0}</div>
+                  <div className="stat-label">Cities</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">{stats.total_countries || 0}</div>
+                  <div className="stat-label">Countries</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-value">{stats.total_appreciations || 0}</div>
+                  <div className="stat-label">Total Appreciations</div>
+                </div>
+              </div>
+            )}
+
+            <div className="analytics-section">
+              <AnalyticsPanel stats={stats} acts={acts} className="standalone" />
+            </div>
+
+            <div className="export-section-wrapper">
+              <ExportButton acts={acts} stats={stats} />
+            </div>
           </div>
-          <Sidebar
-            activeCategory={activeCategory}
-            onCategoryChange={handleCategoryChange}
-            activeTimeFilter={activeTimeFilter}
-            onTimeFilterChange={handleTimeFilterChange}
-            regionData={regionData}
-            onSubmitAct={handleSubmitAct}
-            stats={stats}
-            acts={acts}
-            showAnalytics={true}
-            onSearch={handleSearch}
-            onSearchClear={handleSearchClear}
-          />
-        </div>
+        )}
+
+        <FilterPanel
+          isOpen={filterPanelOpen}
+          onClose={() => setFilterPanelOpen(false)}
+          activeCategory={activeCategory}
+          onCategoryChange={handleCategoryChange}
+          activeTimeFilter={activeTimeFilter}
+          onTimeFilterChange={handleTimeFilterChange}
+          onSearch={handleSearch}
+          onSearchClear={handleSearchClear}
+        />
       </div>
-    </Layout>
+    </div>
   );
 };
 
 export default SantaDashboard;
-

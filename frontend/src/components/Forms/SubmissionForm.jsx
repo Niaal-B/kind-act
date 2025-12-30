@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CATEGORIES, CATEGORY_LABELS, CATEGORY_ICONS } from '../../utils/constants';
 import './SubmissionForm.css';
 
-const SubmissionForm = ({ onSubmit, onClose }) => {
+const SubmissionForm = ({ onSubmit, onClose, hideHeader = false }) => {
   const [formData, setFormData] = useState({
     description: '',
     category: CATEGORIES.FOOD,
@@ -123,14 +123,16 @@ const SubmissionForm = ({ onSubmit, onClose }) => {
   return (
     <div className="submission-form-container">
       <form onSubmit={handleSubmit} className="submission-form">
-        <div className="form-header">
-          <h2>Add Your Act of Kindness</h2>
-          {onClose && (
-            <button type="button" onClick={onClose} className="close-btn" aria-label="Close">
-              ×
-            </button>
-          )}
-        </div>
+        {!hideHeader && (
+          <div className="form-header">
+            <h2>Add Your Act of Kindness</h2>
+            {onClose && (
+              <button type="button" onClick={onClose} className="close-btn" aria-label="Close">
+                ×
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="form-group">
           <label htmlFor="description">

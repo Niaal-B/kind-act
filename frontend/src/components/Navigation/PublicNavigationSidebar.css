@@ -1,0 +1,126 @@
+.public-nav-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 256px;
+  background: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.nav-header {
+  padding: var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.nav-logo-icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary-color);
+  margin-right: var(--spacing-sm);
+}
+
+.nav-logo-text {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.nav-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.nav-menu {
+  flex: 1;
+  padding: var(--spacing-lg);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.nav-item {
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: var(--secondary-color);
+  background: rgba(30, 64, 175, 0.1);
+}
+
+.nav-item-active {
+  background: rgba(30, 64, 175, 0.15);
+  color: var(--secondary-color);
+  font-weight: 500;
+}
+
+.nav-item-action {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: white;
+}
+
+.nav-item-action:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+}
+
+.nav-item-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.nav-footer {
+  padding: var(--spacing-lg);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.nav-user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.nav-user-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+}
+
+.nav-username {
+  font-size: 0.9rem;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-item-logout {
+  color: var(--error-color);
+}
+
+.nav-item-logout:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--error-color);
+}

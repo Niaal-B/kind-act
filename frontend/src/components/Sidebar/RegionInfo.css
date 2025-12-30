@@ -1,14 +1,13 @@
 .region-info {
-  background: var(--background-color);
-  padding: var(--spacing-lg);
+  background: var(--surface-color);
+  padding: var(--spacing-xl);
   border-radius: var(--radius-lg);
-  margin-top: var(--spacing-xl);
   border: 1px solid var(--border-color);
-  display: none;
-}
-
-.region-info.visible {
-  display: block;
+  box-shadow: var(--shadow-lg);
+  max-height: 80vh;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .region-info-empty {

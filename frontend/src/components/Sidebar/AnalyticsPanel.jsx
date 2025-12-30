@@ -3,10 +3,10 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { CATEGORY_LABELS, CATEGORY_ICONS } from '../../utils/constants';
 import './AnalyticsPanel.css';
 
-// Theme colors: Primary (Rose-800), Secondary (Blue-700), Success (Emerald-600), Warning (Orange-500), Purple
-const COLORS = ['#9F1239', '#1D4ED8', '#059669', '#F97316', '#7C3AED'];
+// Christmas theme colors: Red (Primary), Green (Secondary), Gold, Light Green, Dark Red
+const COLORS = ['#DC2626', '#16A34A', '#D97706', '#84CC16', '#B91C1C'];
 
-const AnalyticsPanel = ({ stats, acts }) => {
+const AnalyticsPanel = ({ stats, acts, className = '' }) => {
   if (!stats || !acts) return null;
 
   // Category breakdown data for pie chart
@@ -34,7 +34,7 @@ const AnalyticsPanel = ({ stats, acts }) => {
   const topCities = getTopCities();
 
   return (
-    <div className="analytics-panel">
+    <div className={`analytics-panel ${className}`}>
       <h3 className="analytics-title">📊 Advanced Analytics</h3>
 
       <div className="chart-section">
@@ -75,7 +75,7 @@ const AnalyticsPanel = ({ stats, acts }) => {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#9F1239" name="Acts of Kindness" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="count" fill="#DC2626" name="Acts of Kindness" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

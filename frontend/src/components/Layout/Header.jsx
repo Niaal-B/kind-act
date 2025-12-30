@@ -8,57 +8,62 @@ const Header = ({ stats }) => {
   const isDashboard = location.pathname === '/santa-dashboard';
 
   return (
-    <header className="app-header">
-      <div className="header-content">
-        <div className="header-title">
-          <div className="title-row">
-            <Gift className="header-icon" size={28} />
-            <h1>Santa's Community Impact Map</h1>
+    <header className="layout-header">
+      <div className="header-container">
+        <div className="header-content">
+          <div className="header-left">
+            <Gift className="header-icon" />
+            <div className="header-text">
+              <h1 className="header-title">Santa's Community Impact Map</h1>
+              <p className="header-subtitle">
+                Visualizing acts of kindness across the globe
+              </p>
+            </div>
           </div>
-          <p>Visualizing acts of kindness and community impact across the globe</p>
+          
+          {!isDashboard && (
+            <Link 
+              to="/santa-dashboard" 
+              className="header-link"
+            >
+              <MapPin className="header-link-icon" />
+              Santa Dashboard
+            </Link>
+          )}
+
+          {stats && (
+            <div className="header-stats">
+              <div className="stat-item">
+                <BarChart2 className="stat-icon" />
+                <div className="stat-content">
+                  <div className="stat-value">{stats.total_acts?.toLocaleString() || 0}</div>
+                  <div className="stat-label">Total Acts</div>
+                </div>
+              </div>
+
+              <div className="stat-item">
+                <Globe className="stat-icon" />
+                <div className="stat-content">
+                  <div className="stat-value">{stats.active_regions || 0}</div>
+                  <div className="stat-label">Regions</div>
+                </div>
+              </div>
+
+              <div className="stat-item">
+                <Star className="stat-icon" />
+                <div className="stat-content">
+                  <div className="stat-value">{stats.top_region?.city || 'N/A'}</div>
+                  <div className="stat-label">
+                    Top Region {stats.top_region?.count ? `(${stats.top_region.count})` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        {!isDashboard && (
-          <Link to="/santa-dashboard" className="dashboard-link">
-            <MapPin size={16} />
-            Santa Dashboard
-          </Link>
-        )}
-
-        {stats && (
-          <div className="stats-bar">
-            <div className="stat-item">
-              <span className="stat-icon"><BarChart2 size={20} /></span>
-              <div className="stat-content">
-                <div className="stat-value">{stats.total_acts?.toLocaleString() || 0}</div>
-                <div className="stat-label">Total Acts</div>
-              </div>
-            </div>
-
-            <div className="stat-item">
-              <span className="stat-icon"><Globe size={20} /></span>
-              <div className="stat-content">
-                <div className="stat-value">{stats.active_regions || 0}</div>
-                <div className="stat-label">Active Regions</div>
-              </div>
-            </div>
-
-            <div className="stat-item">
-              <span className="stat-icon"><Star size={20} /></span>
-              <div className="stat-content">
-                <div className="stat-value">
-                  {stats.top_region?.city || 'N/A'}
-                </div>
-                <div className="stat-label">
-                  Top Region {stats.top_region?.count ? `(${stats.top_region.count} acts)` : ''}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </header>
   );
 };
 
 export default Header;
-
