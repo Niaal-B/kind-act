@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, forwardRef } from 'react';
 import './TreeCanvas.css';
 
 // Image paths - replace these with actual images in public/assets/
@@ -247,16 +247,21 @@ const createDecorationPlaceholder = (type, color) => {
   return canvas.toDataURL();
 };
 
-const TreeCanvas = ({ 
+const TreeCanvas = forwardRef(({ 
   decorations = [], 
   treeLevel = 1, 
   onDecorationClick, 
   onDecorationUpdate,
   onDecorationPositionChange,  // New prop for edit mode temporary updates
   editMode = false,  // New prop for edit mode
-  isInteractive = true 
-}) => {
+  isInteractive = true
+}, ref) => {
   const containerRef = useRef(null);
+  
+  // Expose container ref for export
+  React.useImperativeHandle(ref, () => ({
+    getElement: () => containerRef.current
+  }));
   const [dimensions, setDimensions] = useState({ width: 600, height: 800 });
   const [dragging, setDragging] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
@@ -540,6 +545,8 @@ const TreeCanvas = ({
       )}
     </div>
   );
-};
+});
+
+TreeCanvas.displayName = 'TreeCanvas';
 
 export default TreeCanvas;

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import PublicNavigationSidebar from '../components/Navigation/PublicNavigationSidebar';
 import { treeAPI } from '../services/api';
 import TreeCanvas from '../components/Tree/TreeCanvas';
 import TreeProgress from '../components/Tree/TreeProgress';
-import { Sparkles, RefreshCw, Share2, Gift, Edit2, Save, X } from 'lucide-react';
+import { Sparkles, RefreshCw, Share2, Gift, Edit2, Save, X, Download, Image as ImageIcon } from 'lucide-react';
+import { exportTreeAsImage, downloadTreeImage, shareTreeImage } from '../utils/treeExport';
 import './MyTreePage.css';
 
 const MyTreePage = () => {
@@ -16,6 +17,8 @@ const MyTreePage = () => {
   const [tempDecorations, setTempDecorations] = useState([]);
   const [originalDecorations, setOriginalDecorations] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const treeCanvasRef = useRef(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -41,20 +44,92 @@ const MyTreePage = () => {
     fetchTree();
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "My Christmas Tree of Kindness",
-          text: `Check out my tree with ${treeData?.total_decorations || 0} decorations!`,
-          url: window.location.href,
-        });
-      } catch {
-        console.log('Share cancelled');
+  const handleExportTree = async () => {
+    if (!treeCanvasRef.current || !treeData) {
+      alert('Tree not loaded yet. Please wait...');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const treeElement = treeCanvasRef.current.getElement();
+      if (!treeElement) {
+        throw new Error('Tree element not found');
       }
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Link copied to clipboard!');
+
+      // Capture the entire tree-canvas-container to preserve all positioning
+      const elementToCapture = treeElement;
+
+      // Export tree as image
+      const blob = await exportTreeAsImage(elementToCapture, treeData, user?.username || 'User');
+      
+      // Download the image
+      downloadTreeImage(blob, `${user?.username || 'my'}-christmas-tree.png`);
+      
+      alert('Tree image downloaded successfully! 🎄');
+    } catch (error) {
+      console.error('Error exporting tree:', error);
+      alert('Failed to export tree. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!treeCanvasRef.current || !treeData) {
+      // Fallback to URL sharing if tree not ready
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "My Christmas Tree of Kindness",
+            text: `Check out my tree with ${treeData?.total_decorations || 0} decorations!`,
+            url: window.location.href,
+          });
+        } catch {
+          console.log('Share cancelled');
+        }
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const treeElement = treeCanvasRef.current.getElement();
+      if (!treeElement) {
+        throw new Error('Tree element not found');
+      }
+
+      // Capture the entire tree-canvas-container to preserve all positioning
+      const elementToCapture = treeElement;
+
+      // Export tree as image
+      const blob = await exportTreeAsImage(elementToCapture, treeData, user?.username || 'User');
+      
+      // Share the image
+      const shareText = `Check out my Christmas Tree of Kindness! 🎄\n${treeData?.total_acts || 0} acts of kindness • ${treeData?.total_decorations || 0} decorations • Level ${treeData?.tree_level || 1}`;
+      await shareTreeImage(blob, shareText);
+    } catch (error) {
+      console.error('Error sharing tree:', error);
+      // Fallback to URL sharing
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "My Christmas Tree of Kindness",
+            text: `Check out my tree with ${treeData?.total_decorations || 0} decorations!`,
+            url: window.location.href,
+          });
+        } catch {
+          console.log('Share cancelled');
+        }
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -226,10 +301,24 @@ const MyTreePage = () => {
                       <Edit2 className="button-icon" />
                       Edit
                     </button>
+                    <button 
+                      onClick={handleExportTree} 
+                      className="btn-secondary btn-export" 
+                      title="Download Tree Image"
+                      disabled={isExporting}
+                    >
+                      <Download className="button-icon" />
+                      {isExporting ? 'Exporting...' : 'Download'}
+                    </button>
                     <button onClick={handleRefresh} className="btn-icon" title="Refresh">
                       <RefreshCw className="icon" />
                     </button>
-                    <button onClick={handleShare} className="btn-icon" title="Share">
+                    <button 
+                      onClick={handleShare} 
+                      className="btn-icon" 
+                      title="Share Tree"
+                      disabled={isExporting}
+                    >
                       <Share2 className="icon" />
                     </button>
                   </>
@@ -243,6 +332,7 @@ const MyTreePage = () => {
               <div className={`tree-canvas-card card ${isEditMode ? 'edit-mode-border' : ''}`}>
                 <div className="tree-canvas-wrapper">
                   <TreeCanvas
+                    ref={treeCanvasRef}
                     decorations={decorationsToDisplay}
                     treeLevel={treeData?.tree_level || 1}
                     isInteractive={true}

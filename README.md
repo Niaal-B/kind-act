@@ -75,26 +75,30 @@ Christmas Tree of Kindness is a full-stack web application that gamifies acts of
 ## 📸 Screenshots
 
 ### Home Page - Interactive Map
-![Home Page](https://via.placeholder.com/800x450/1E40AF/FFFFFF?text=Interactive+Map+View)
+![Home Page](./screenshots/home-page-map.png)
 *View all acts of kindness on an interactive world map with heat visualization*
 
 ### My Tree Page
-![My Tree](https://via.placeholder.com/800x450/16A34A/FFFFFF?text=Personalized+Christmas+Tree)
+![My Tree](./screenshots/my-tree.png)
 *Your personalized Christmas tree with decorations unlocked by acts of kindness*
 
 ### Edit Mode
-![Edit Mode](https://via.placeholder.com/800x450/9333EA/FFFFFF?text=Edit+Mode+-+Customize+Tree)
+![Edit Mode](./screenshots/edit-mode.png)
 *Drag and drop decorations to customize your tree layout*
 
+### Act Details View
+![Act Details](./screenshots/act-details.png)
+*Click on any act on the map to view detailed information about acts of kindness, including location, category, description, and nearby acts*
+
 ### Santa Dashboard
-![Dashboard](https://via.placeholder.com/800x450/DC2626/FFFFFF?text=Santa+Dashboard+-+Analytics)
+![Dashboard](./screenshots/santa-dashboard.png)
 *Admin dashboard with statistics, charts, and data export*
 
 ### Progress Tracking
-![Progress](https://via.placeholder.com/800x450/FBBF24/FFFFFF?text=Progress+Tracking)
+![Progress](./screenshots/progress-tracking.png)
 *Track your milestones and see your next goals*
 
-> **Note**: Replace the placeholder images above with actual screenshots from your application for the best presentation.
+> **Note**: Add your screenshots to the `screenshots/` folder with the filenames shown above. The images will be displayed once you add them to the repository.
 
 ## 🚀 Setup Instructions
 
