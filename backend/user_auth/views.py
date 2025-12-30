@@ -104,24 +104,15 @@ def login_view(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])  # Allow logout without auth in case token is invalid
 def logout_view(request):
-    """Logout the current user (blacklist refresh token)"""
-    try:
-        refresh_token = request.data.get('refresh')
-        if refresh_token:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        return Response({
-            'success': True,
-            'message': 'Logout successful'
-        })
-    except Exception as e:
-        # Even if token blacklist fails, return success
-        return Response({
-            'success': True,
-            'message': 'Logout successful'
-        })
+    """Logout the current user"""
+    # JWT tokens are stateless, so we just return success
+    # The frontend will clear the tokens from localStorage
+    return Response({
+        'success': True,
+        'message': 'Logout successful'
+    })
 
 
 @api_view(['GET'])
