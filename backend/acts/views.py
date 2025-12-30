@@ -46,6 +46,23 @@ class ActViewSet(viewsets.ModelViewSet):
         return queryset
     
     @action(detail=False, methods=['get'])
+    def community(self, request):
+        """Get acts with images for community feed (Instagram-like)"""
+        # Filter acts that have evidence_url (images)
+        acts_with_images = Act.objects.filter(
+            evidence_url__isnull=False
+        ).exclude(evidence_url='').order_by('-created_at')
+        
+        # Pagination
+        page = self.paginate_queryset(acts_with_images)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(acts_with_images, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get global statistics"""
         total_acts = Act.objects.count()

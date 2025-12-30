@@ -108,6 +108,9 @@ export const actsAPI = {
 
   // Get nearby acts
   nearbyActs: (params) => api.get('/acts/nearby_acts/', { params }),
+
+  // Get community feed (acts with images)
+  getCommunity: (params = {}) => api.get('/acts/community/', { params }),
 };
 
 // Auth API

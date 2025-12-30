@@ -8,6 +8,7 @@ import MyTreePage from './pages/MyTreePage';
 import SantaDashboard from './pages/SantaDashboard';
 import SantaStats from './pages/SantaStats';
 import ChatWithSantaPage from './pages/ChatWithSantaPage';
+import CommunityPage from './pages/CommunityPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import './App.css';
@@ -44,6 +45,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          <Route path="/community" element={<CommunityPage />} />
           <Route path="/santa-dashboard" element={<SantaDashboard />} />
           <Route path="/santa-stats" element={<SantaStats />} />
         </Routes>
