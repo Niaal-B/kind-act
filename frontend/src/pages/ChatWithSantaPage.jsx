@@ -31,9 +31,8 @@ const ChatWithSantaPage = () => {
     try {
       setLoadingHistory(true);
       const response = await chatAPI.getHistory();
-      // Reverse to show oldest first
-      const reversedMessages = (response.data || []).reverse();
-      setMessages(reversedMessages);
+      // Backend returns messages in chronological order (oldest first)
+      setMessages(response.data || []);
     } catch (error) {
       console.error('Error loading chat history:', error);
     } finally {

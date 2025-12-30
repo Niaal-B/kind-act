@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import PublicNavigationSidebar from '../components/Navigation/PublicNavigationSidebar';
 import AddActPage from '../components/Pages/AddActPage';
 import { actsAPI, treeAPI } from '../services/api';
 
@@ -19,7 +20,12 @@ const AddActPageRoute = () => {
     }
   };
 
-  return <AddActPage onSubmitAct={handleSubmitAct} />;
+  return (
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <PublicNavigationSidebar />
+      <AddActPage onSubmitAct={handleSubmitAct} />
+    </div>
+  );
 };
 
 export default AddActPageRoute;
