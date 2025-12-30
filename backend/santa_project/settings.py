@@ -28,14 +28,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-1(_cv_asccc1=ee0x--l&
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS: Allow any .onrender.com subdomain in production, or use env var
-if config('ALLOWED_HOSTS', default=None):
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+ALLOWED_HOSTS_ENV = config('ALLOWED_HOSTS', default='')
+if ALLOWED_HOSTS_ENV:
+    ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
 elif not DEBUG:
     # In production (DEBUG=False), allow any .onrender.com subdomain
+    # The leading dot allows all subdomains of onrender.com
     ALLOWED_HOSTS = ['.onrender.com']
 else:
     # Development defaults
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '127.0.0.1:8000']
 
 
 # Application definition
